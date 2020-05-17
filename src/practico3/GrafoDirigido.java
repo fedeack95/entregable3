@@ -1,9 +1,9 @@
 package practico3;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
 
 public class GrafoDirigido<T> implements Grafo<T> {
 	
@@ -25,22 +25,28 @@ public class GrafoDirigido<T> implements Grafo<T> {
 	}
 
 	@Override
-	public void borrarVertice(int verticeId) {
-		//buscar en todos los arcos y eliminar el vertice 
-	    if(this.contieneVertice(verticeId)) {
-			 this.vertices.remove(verticeId);
+	public boolean borrarVertice(int verticeId) {
+		//buscar en todos los arcos y eliminar el vertice
+		Iterator<Vertice<T>> iterator = this.getVertices();
+		boolean isDeleted = false;
+		while(iterator.hasNext()) {
+		   Vertice<T> current = iterator.next();
+		   isDeleted = current.removeVerticeInArco(verticeId);
 		}
-
+		
+	    return isDeleted;
 	}
+	
 
 	@Override
 	public void agregarArco(int verticeId1, int verticeId2, T etiqueta) {
-		
 		if(!this.existeArco(verticeId1, verticeId2)) {
-			Arco<T> newArco = new Arco<T>(verticeId1, verticeId2, etiqueta);
-			Vertice<T> newVertice = new Vertice<T> (verticeId2);
-			this.vertices.get(verticeId1).addArco(newVertice,etiqueta);
-			this.cantArcos++;
+			this.agregarVertice(verticeId1);
+			this.agregarVertice(verticeId2);
+			Vertice<T> v1 = this.vertices.get(verticeId1);
+			Vertice<T> v2 = this.vertices.get(verticeId2);
+			v1.addArco(v2, etiqueta);
+	        this.cantArcos++;
 		}
 
 	}
@@ -48,9 +54,10 @@ public class GrafoDirigido<T> implements Grafo<T> {
 	@Override
 	public void borrarArco(int verticeId1, int verticeId2) {
 		if (this.contieneVertice(verticeId1)) {
-			Vertice v = this.vertices.get(verticeId1);
-			if(!v.contieneArco(verticeId2)) {
-				 v.removeArco(verticeId2, v);
+			Vertice<T> v = this.vertices.get(verticeId1);
+			if(v.contieneArco(verticeId2)) {
+				 v.removeArco(verticeId2);
+				 cantArcos--;
 			}
 		}
 	}
@@ -65,11 +72,9 @@ public class GrafoDirigido<T> implements Grafo<T> {
 		if(this.vertices.size() == 0) {
 			return false;
 		}
-		
 		if(!this.contieneVertice(verticeId1)) {
 			 return false;
 		}
-		
 		return this.vertices.get(verticeId1).contieneArco(verticeId2);
 	}
 
@@ -84,7 +89,6 @@ public class GrafoDirigido<T> implements Grafo<T> {
 
 	@Override
 	public int cantidadVertices() {
-		// TODO Auto-generated method stub
 		return this.vertices.size();
 	}
 
@@ -102,14 +106,18 @@ public class GrafoDirigido<T> implements Grafo<T> {
 		}
 		return output.iterator();
 	}
+	
+	
+	private Iterator<Vertice<T>> getVertices() {
+		Collection<Vertice<T>> values = this.vertices.values();
+		return values.iterator();
+	}
 
 	@Override
 	public Iterator<Integer> obtenerAdyacentes(int verticeId) {
-		// TODO uto-generated method stub
 		return null;
 	}
 
-	//por ahora no hace falta
 	@Override
 	public Iterator<Arco<T>> obtenerArcos() {
 		// TODO Auto-generated method stub
@@ -118,9 +126,11 @@ public class GrafoDirigido<T> implements Grafo<T> {
 
 	@Override
 	public Iterator<Arco<T>> obtenerArcos(int verticeId) {
-		
-		return null;
+	   return this.vertices.get(verticeId).getArcos();
 	}
-
+	
+	public void DFS() {
+		
+	}
 
 }
